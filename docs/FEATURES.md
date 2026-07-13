@@ -486,7 +486,7 @@ A feature is complete when:
 * Requirements are implemented.
 * Validation is present.
 * Error handling exists.
-* TypeScript types are defined.
+* TypeScript types (frontend) and Pydantic schemas (backend) are defined.
 * API contract is documented.
 * Feature is tested.
 * Code review checklist passes.

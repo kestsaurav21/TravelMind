@@ -92,28 +92,28 @@ Build a full-stack AI-powered travel planning platform that helps users:
 
 # Backend Skills
 
-## Node.js
+## Python
 
-* Event Loop
-* Async/Await
-* Environment Variables
-* File Handling
+* Async / Await & Concurrency
+* Virtual Environments (venv)
+* Package Management (pip)
+* Type Hinting (PEP 484)
 
-## Express.js
+## FastAPI
 
 ### API Development
 
 * REST APIs
-* Middleware
-* Request Validation
-* Error Handling
+* Dependency Injection (Depends)
+* Request Validation & Serialization (Pydantic)
+* CORS & Middleware
+* Exception Handling & HTTPExceptions
 
 ### Security
 
-* Rate Limiting
-* CORS
-* Helmet
-* Input Sanitization
+* OAuth2 password flow with JWT
+* Password hashing (passlib with bcrypt)
+* Environment variable configuration (python-dotenv or Pydantic Settings)
 
 ---
 
@@ -152,15 +152,15 @@ Build a full-stack AI-powered travel planning platform that helps users:
 
 ---
 
-## Prisma ORM
+## SQLAlchemy ORM & Alembic
 
 ### Features
 
-* Schema Design
-* Migrations
-* CRUD Operations
-* Relations
-* Transactions
+* Declarative Mapping & Models
+* Database Session Management
+* Migrations with Alembic
+* Relationships (One-to-Many, Many-to-Many)
+* Transactions & CRUD Operations
 
 ---
 

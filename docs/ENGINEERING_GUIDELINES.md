@@ -46,14 +46,16 @@ The goal is to ensure consistency, maintainability, scalability, and readability
 
 ## Backend
 
-* Node.js
-* Express.js
-* TypeScript
+* Python (3.10+)
+* FastAPI
+* Pydantic
+* Uvicorn
 
 ## Database
 
 * PostgreSQL
-* Prisma ORM
+* SQLAlchemy ORM (or SQLModel)
+* Alembic (Migrations)
 
 ---
 
@@ -98,96 +100,66 @@ must be typed.
 
 ---
 
+# Python Rules
+
+## Type Hinting
+
+All Python function signatures must use explicit PEP 484 type hints.
+
+```python
+def get_trip(db: Session, trip_id: UUID) -> Optional[Trip]:
+    ...
+```
+
+## Virtual Environments
+
+Always run the backend in a virtual environment (`.venv` or `env`). Do not install packages globally.
+
+## Pydantic Validation
+
+Always define Pydantic schemas for request bodies (`TripCreate`, `TripUpdate`) and response models (`TripOut`). Let FastAPI handle validation and serialization.
+
+---
+
 # Naming Conventions
 
 ## Variables
 
-```ts
-tripBudget
-destinationName
-```
-
-Use:
-
-```text
-camelCase
-```
+* **Frontend (TypeScript)**: Use camelCase (e.g., `tripBudget`, `destinationName`).
+* **Backend (Python)**: Use snake_case (e.g., `trip_budget`, `destination_name`).
 
 ---
 
 ## Functions
 
-```ts
-generateItinerary()
-calculateTripBudget()
-```
-
-Use:
-
-```text
-camelCase
-```
+* **Frontend (TypeScript)**: Use camelCase (e.g., `generateItinerary()`, `calculateTripBudget()`).
+* **Backend (Python)**: Use snake_case (e.g., `generate_itinerary()`, `calculate_trip_budget()`).
 
 ---
 
-## React Components
+## Classes & React Components
 
-```tsx
-TripCard.tsx
-BudgetSummary.tsx
-```
-
-Use:
-
-```text
-PascalCase
-```
+* **Frontend (TypeScript Components)**: Use PascalCase (e.g., `TripCard.tsx`, `BudgetSummary.tsx`).
+* **Backend (Python Classes/Models/Schemas)**: Use PascalCase (e.g., `TripModel`, `TripCreateSchema`).
 
 ---
 
-## Interfaces
+## Interfaces & Types
 
-```ts
-interface Trip
-interface User
-```
-
-Use:
-
-```text
-PascalCase
-```
+* **Frontend (TypeScript)**: Use PascalCase (e.g., `interface Trip`, `type TravelStyle`).
 
 ---
 
 ## Constants
 
-```ts
-MAX_TRIP_DAYS
-DEFAULT_BUDGET
-```
-
-Use:
-
-```text
-UPPER_SNAKE_CASE
-```
+* **Both**: Use UPPER_SNAKE_CASE (e.g., `MAX_TRIP_DAYS`, `DEFAULT_BUDGET`).
 
 ---
 
 ## Files
 
-```text
-trip-service.ts
-budget-utils.ts
-auth-controller.ts
-```
-
-Use:
-
-```text
-kebab-case
-```
+* **Frontend (TypeScript)**: Use kebab-case (e.g., `trip-service.ts`, `budget-utils.ts`).
+* **Backend (Python)**: Use snake_case (e.g., `trip_service.py`, `budget_utils.py`).
 
 ---
 
@@ -260,26 +232,27 @@ TanStack Query
 Use a layered architecture.
 
 ```text
-Controller
+Router (Endpoints)
     ↓
-Service
+Service Layer
     ↓
-Repository
+CRUD / Repository
     ↓
 Database
 ```
 
 ---
 
-## Controllers
+## Routers (Endpoints)
 
 Responsibilities:
 
-* Receive requests
-* Validate inputs
-* Return responses
+* Define HTTP path operations (e.g. `@router.post("/")`)
+* Validate input payloads via Pydantic schemas
+* Handle API dependencies (e.g. database sessions, current user authentication)
+* Return responses serialized via Pydantic response models
 
-Controllers must not contain business logic.
+Routers must not contain business logic.
 
 ---
 
@@ -287,21 +260,18 @@ Controllers must not contain business logic.
 
 Responsibilities:
 
-* Business logic
-* Data transformation
-* AI integration
-* External API orchestration
+* Business logic (e.g., prompt engineering, budget estimations)
+* Data transformation and third-party API orchestration (Gemini, Open-Meteo)
 
 ---
 
-## Repositories
+## CRUD (Repositories)
 
 Responsibilities:
 
-* Database queries
-* Data persistence
+* Database queries and data persistence operations using SQLAlchemy sessions
 
-Repositories should not contain business logic.
+CRUD methods should not contain business logic.
 
 ---
 
@@ -492,11 +462,11 @@ docs: update architecture document
 Before merging:
 
 * Code builds successfully
-* No TypeScript errors
-* No unused code
-* No console logs
-* Proper error handling
-* Types are defined
+* No TypeScript or Python type/linting errors
+* No unused code or imports
+* No debug prints/console logs
+* Proper error handling (HTTPException in Python, error boundary in React)
+* Types and schemas are defined
 * Tests pass
 
 ---

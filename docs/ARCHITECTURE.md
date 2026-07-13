@@ -40,7 +40,7 @@ React Frontend
 
 ↓
 
-Express API
+FastAPI Router
 
 ↓
 
@@ -48,7 +48,7 @@ Service Layer
 
 ↓
 
-Repository Layer
+CRUD / Repository Layer
 
 ↓
 
@@ -172,71 +172,83 @@ Loader
 
 Pattern:
 
-Layered Modular Architecture
+Layered Architecture (FastAPI standards)
 
 ---
 
 # Backend Folder Structure
 
 ```text
-src/
+app/
 
-├── modules/
-│   ├── auth/
-│   ├── users/
-│   ├── trips/
-│   ├── itinerary/
-│   ├── weather/
-│   └── maps/
+├── api/
+│   ├── v1/
+│   │   ├── endpoints/
+│   │   │   ├── auth.py
+│   │   │   ├── users.py
+│   │   │   ├── trips.py
+│   │   │   ├── itinerary.py
+│   │   │   ├── weather.py
+│   │   │   └── maps.py
+│   │   └── api.py
 │
-├── shared/
-│   ├── middleware/
-│   ├── errors/
-│   ├── logger/
-│   ├── validators/
-│   └── utils/
+├── core/
+│   ├── config.py
+│   ├── security.py
+│   └── database.py
 │
-├── config/
+├── crud/
+│   ├── crud_user.py
+│   ├── crud_trip.py
+│   └── ...
 │
-├── prisma/
+├── models/
+│   ├── user.py
+│   ├── trip.py
+│   └── ...
 │
-└── server.ts
+├── schemas/
+│   ├── user.py
+│   ├── trip.py
+│   └── ...
+│
+├── services/
+│   ├── ai.py
+│   ├── weather.py
+│   ├── maps.py
+│   └── ...
+│
+└── main.py
 ```
 
 ---
 
-# Module Structure
+# Domain Structure
 
-Each module contains:
+Each domain model has its components defined in their respective directories:
 
-```text
-trips/
-
-├── trip.controller.ts
-├── trip.service.ts
-├── trip.repository.ts
-├── trip.routes.ts
-├── trip.validator.ts
-├── trip.types.ts
-└── trip.dto.ts
-```
+- **Router**: `app/api/v1/endpoints/trips.py`
+- **CRUD Operations**: `app/crud/crud_trip.py`
+- **SQLAlchemy Model**: `app/models/trip.py`
+- **Pydantic Schemas / DTOs**: `app/schemas/trip.py`
+- **Business Logic Services**: `app/services/trip_service.py`
 
 ---
 
 # Layer Responsibilities
 
-## Controller Layer
+## Router Layer (Endpoints)
 
 Responsibilities:
 
-* Receive requests
-* Validate request payload
-* Return responses
+* Receive HTTP requests
+* Define path operations and request query/path parameters
+* Call services or CRUD layers
+* Return responses serialized via Pydantic schemas
 
 Should NOT:
 
-* Access database directly
-* Contain business logic
+* Perform direct database access (queries/inserts) without using database session dependency
 
 ---
 
@@ -244,44 +256,37 @@ Should NOT:
 
 Responsibilities:
 
-* Business logic
-* AI orchestration
-* External API integration
+* Complex business logic (e.g. AI prompt generation, weather data integration)
+* Orchestrating third-party APIs
 * Data transformation
-
-Should NOT:
-
-* Directly communicate with HTTP requests
 
 ---
 
-## Repository Layer
+## CRUD / Repository Layer
 
 Responsibilities:
 
 * Database access
-* CRUD operations
+* Standard create, read, update, delete operations using SQLAlchemy session
 
 Should NOT:
 
-* Contain business logic
+* Contain domain-specific business logic
 
 ---
 
 # AI Architecture
 
-Create a dedicated AI module. *(Note: For the MVP, this module will make raw SDK calls directly to the Gemini API. LangChain & RAG will be deferred to V2 future extensions).*
+Create a dedicated AI module inside the services layer. *(Note: For the MVP, this module will make raw SDK calls directly to the Gemini API. LangChain & RAG will be deferred to V2 future extensions).*
 
 ```text
-modules/
+app/services/ai/
 
-ai/
-
-├── ai.service.ts
-├── prompt-builder.ts
-├── itinerary-generator.ts
-├── budget-generator.ts
-└── ai.types.ts
+├── ai_service.py
+├── prompt_builder.py
+├── itinerary_generator.py
+├── budget_generator.py
+└── schemas.py
 ```
 
 ---
@@ -318,17 +323,14 @@ Frontend
 
 # Weather Architecture
 
-Dedicated Weather Module
+Dedicated Weather Module in Services/Endpoints
 
 ```text
-modules/
+app/services/weather/
 
-weather/
-
-├── weather.controller.ts
-├── weather.service.ts
-├── weather.provider.ts
-└── weather.types.ts
+├── weather_service.py
+├── weather_provider.py
+└── schemas.py
 ```
 
 Provider handles:
@@ -341,17 +343,14 @@ Provider handles:
 
 # Map Architecture
 
-Dedicated Maps Module
+Dedicated Maps Module in Services/Endpoints
 
 ```text
-modules/
+app/services/maps/
 
-maps/
-
-├── maps.controller.ts
-├── maps.service.ts
-├── maps.provider.ts
-└── maps.types.ts
+├── maps_service.py
+├── maps_provider.py
+└── schemas.py
 ```
 
 Responsibilities:
@@ -364,17 +363,17 @@ Responsibilities:
 
 # Database Access
 
-Use Prisma ORM
+Use SQLAlchemy ORM & Alembic Migrations
 
 Application
 
 ↓
 
-Repository
+CRUD Layer
 
 ↓
 
-Prisma Client
+SQLAlchemy Session
 
 ↓
 
