@@ -40,3 +40,12 @@ class TripOut(TripBase):
     user_id: UUID
     created_at: datetime
     updated_at: datetime
+
+# Response Wrapper Envelopes
+class TripResponse(BaseSchema):
+    success: bool = True
+    data: TripOut
+
+class TripListResponse(BaseSchema):
+    success: bool = True
+    data: List[TripOut]
