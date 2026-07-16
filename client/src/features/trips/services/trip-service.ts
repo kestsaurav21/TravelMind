@@ -1,6 +1,30 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '../../../lib/api-client';
 
+export interface ItineraryActivity {
+  time: string;
+  activity: string;
+  description: string;
+  location: string;
+  cost: number;
+}
+
+export interface ItineraryDay {
+  day: number;
+  title: string;
+  activities: ItineraryActivity[];
+}
+
+export interface BudgetBreakdown {
+  transportation: number;
+  accommodation: number;
+  food: number;
+  activities: number;
+  miscellaneous: number;
+  total_estimated?: number;
+  totalEstimated?: number;
+}
+
 export interface Trip {
   id: string;
   userId: string;
@@ -11,6 +35,10 @@ export interface Trip {
   budget: number;
   travelStyle: string | null;
   interests: string[];
+  latitude: number | null;
+  longitude: number | null;
+  itinerary: ItineraryDay[] | null;
+  budgetBreakdown: BudgetBreakdown | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -115,6 +143,23 @@ export function useDeleteTrip() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
+    },
+  });
+}
+
+// Generate itinerary with AI
+export function useGenerateItinerary(tripId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<Trip, Error, void>({
+    mutationFn: async () => {
+      const response = await apiRequest<TripResponse>(`/trips/${tripId}/generate`, {
+        method: 'POST',
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips', tripId] });
     },
   });
 }

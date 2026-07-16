@@ -17,6 +17,12 @@ class Trip(Base):
     travel_style = Column(String, nullable=True)
     interests = Column(JSON, nullable=True)  # Store array of strings like ["history", "nature"]
     
+    # AI-generated fields
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    itinerary = Column(JSON, nullable=True)
+    budget_breakdown = Column(JSON, nullable=True)
+    
     # Audit fields
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

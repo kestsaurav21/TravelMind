@@ -34,10 +34,18 @@ class TripUpdate(BaseSchema):
     budget: Optional[float] = Field(None, ge=0)
     travel_style: Optional[str] = None
     interests: Optional[List[str]] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    itinerary: Optional[List[dict]] = None
+    budget_breakdown: Optional[dict] = None
 
 class TripOut(TripBase):
     id: UUID
     user_id: UUID
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    itinerary: Optional[List[dict]] = None
+    budget_breakdown: Optional[dict] = None
     created_at: datetime
     updated_at: datetime
 

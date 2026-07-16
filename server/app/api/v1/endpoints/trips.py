@@ -19,8 +19,54 @@ from app.schemas.trip import (
     TripResponse,
     TripListResponse,
 )
+from app.services.maps import geocode_destination
+from app.services.ai import generate_itinerary_with_gemini
 
 router = APIRouter()
+
+@router.post("/{trip_id}/generate", response_model=TripResponse)
+async def generate_trip_itinerary(
+    trip_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> dict:
+    """
+    Generate an AI itinerary and budget breakdown for a specific trip.
+    First geocodes the destination if coordinates are missing, then generates the plan.
+    """
+    trip = get_trip_by_id(db, trip_id=trip_id, user_id=current_user.id)
+    if not trip:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Trip not found or you do not have permission to modify it"
+        )
+        
+    # Geocode if lat/lon is missing
+    if trip.latitude is None or trip.longitude is None:
+        coords = await geocode_destination(trip.destination)
+        if coords:
+            trip.latitude = coords["latitude"]
+            trip.longitude = coords["longitude"]
+            
+    # Generate itinerary
+    result = await generate_itinerary_with_gemini(
+        destination=trip.destination,
+        departure_location=trip.departure_location,
+        start_date=trip.start_date.strftime("%Y-%m-%d"),
+        end_date=trip.end_date.strftime("%Y-%m-%d"),
+        budget=trip.budget,
+        travel_style=trip.travel_style,
+        interests=trip.interests or []
+    )
+    
+    trip.itinerary = result["itinerary"]
+    trip.budget_breakdown = result["budget_breakdown"]
+    
+    db.add(trip)
+    db.commit()
+    db.refresh(trip)
+    
+    return {"success": True, "data": trip}
 
 @router.post("/", response_model=TripResponse, status_code=status.HTTP_201_CREATED)
 def create_new_trip(
