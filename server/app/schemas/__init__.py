@@ -1,5 +1,5 @@
 from app.schemas.user import UserCreate, UserUpdate, UserOut, Token, TokenData, UserResponse, TokenResponse
-from app.schemas.trip import TripCreate, TripUpdate, TripOut
+from app.schemas.trip import TripCreate, TripUpdate, TripOut, TripResponse, TripListResponse
 
 __all__ = [
     "UserCreate",
@@ -12,4 +12,6 @@ __all__ = [
     "TripCreate",
     "TripUpdate",
     "TripOut",
+    "TripResponse",
+    "TripListResponse",
 ]
